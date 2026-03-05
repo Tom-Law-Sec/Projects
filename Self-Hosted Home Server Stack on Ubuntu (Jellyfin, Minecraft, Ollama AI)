@@ -1,0 +1,301 @@
+This guide walks through setting up a lightweight self-hosted server stack using Docker on Ubuntu.
+
+The stack includes:
+
+Jellyfin media server
+
+Minecraft Java server
+
+Ollama local AI server
+
+OpenWebUI for interacting with the AI
+
+The setup is designed for low-power hardware.
+
+Tested Hardware
+
+This setup was tested on:
+
+Component	Specification
+Device	Intel NUC
+CPU	Intel Core i5 (4 cores)
+RAM	8 GB
+OS	Ubuntu 24.04
+Performance Results
+
+Based on testing with the above hardware:
+
+Jellyfin
+
+2–3 simultaneous 1080p streams worked without issues.
+
+Minecraft Server
+
+The server runs smoothly with a small number of players.
+
+A Jellyfin stream can run at the same time without problems.
+
+If multiple Jellyfin streams and Minecraft are active, performance may degrade.
+
+Ollama AI
+
+This guide uses the TinyLlama model.
+
+The model runs but responses are slow on CPU.
+
+For practical usage more RAM would be recommended.
+
+Larger models such as Qwen can be used but require additional memory.
+
+For this setup the AI server is mainly a proof of concept.
+
+Operating System
+
+This guide uses Ubuntu 24.04 Desktop.
+
+Ubuntu Server will also work, however commands may differ slightly on other operating systems.
+
+Note
+
+If you are storing media or AI datasets on external drives you must mount them manually and update the Docker volume paths accordingly.
+
+1. Install Ubuntu
+
+Install Ubuntu 24.04 Desktop or Server.
+
+During installation:
+
+Use default partitioning
+
+Create a user account
+
+Ensure network connectivity
+
+After installation update the system:
+
+sudo apt update
+sudo apt upgrade -y
+2. Install Docker
+
+Install Docker and the Compose plugin.
+
+sudo apt install docker.io docker-compose-plugin -y
+
+Start and enable Docker:
+
+sudo systemctl enable docker
+sudo systemctl start docker
+
+Allow your user to run Docker without sudo:
+
+sudo usermod -aG docker $USER
+
+Apply the change:
+
+newgrp docker
+
+Verify Docker is working:
+
+docker ps
+3. Create the Project Directory
+
+Create a directory to store the configuration.
+
+mkdir ~/services
+cd ~/services
+4. Create the Docker Compose Configuration
+
+Create the compose file:
+
+nano docker-compose.yml
+
+Paste the following configuration:
+
+services:
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./jellyfin/config:/config
+      - ./media:/media
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: "1"
+
+  minecraft:
+    image: itzg/minecraft-server
+    container_name: minecraft
+    ports:
+      - "25565:25565"
+    volumes:
+      - ./minecraft:/data
+    environment:
+      - EULA=TRUE
+      - MEMORY=2G
+    restart: unless-stopped
+    mem_limit: 3g
+    cpus: "2"
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: "1"
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: "0.75"
+
+Save and exit:
+
+CTRL + O
+CTRL + X
+5. Start All Services
+
+Launch the containers:
+
+docker compose up -d
+
+Verify they are running:
+
+docker ps
+
+Expected containers:
+
+jellyfin
+minecraft
+ollama
+openwebui
+6. Access the Services
+
+Find your server IP:
+
+ip a
+
+Example:
+
+192.168.1.50
+Jellyfin
+
+Open in a browser:
+
+http://SERVER-IP:8096
+
+Follow the setup wizard and configure your media libraries.
+
+OpenWebUI (AI Interface)
+
+Open:
+
+http://SERVER-IP:3000
+
+This provides a web interface for interacting with Ollama models.
+
+Minecraft Server
+
+Connect from Minecraft Java Edition using:
+
+SERVER-IP:25565
+7. Install a Lightweight AI Model
+
+Install TinyLlama:
+
+docker exec -it ollama ollama pull tinyllama
+
+Verify installation:
+
+docker exec -it ollama ollama list
+
+Example output:
+
+NAME
+tinyllama
+
+Refresh the OpenWebUI page and select the model.
+
+8. Folder Structure
+
+After setup your directory will look like this:
+
+services/
+├── docker-compose.yml
+├── jellyfin/
+│   └── config/
+├── minecraft/
+├── ollama/
+└── media/
+
+Place media files inside the media directory.
+
+9. Managing the Server
+
+Start services:
+
+docker compose up -d
+
+Stop services:
+
+docker compose down
+
+View logs:
+
+docker logs CONTAINER_NAME
+
+Example:
+
+docker logs minecraft
+10. Resource Allocation
+
+Recommended memory usage for an 8 GB system:
+
+Service	RAM
+Minecraft	~3 GB
+Jellyfin	~1 GB
+Ollama	~1 GB
+OpenWebUI	~1 GB
+
+This leaves enough memory for the operating system.
+
+11. Optional: External Storage
+
+For larger media libraries or AI datasets you may want to use external drives.
+
+Example mount point:
+
+/media/server/Elements
+
+Update the compose file volume mapping accordingly:
+
+/media/server/Elements:/media
+Optional: Remote Access with Tailscale
+
+You may also consider installing Tailscale VPN to access your services remotely.
+
+Tailscale allows secure access to your server from anywhere with an internet connection.
+
+Result:
+
+You now have a lightweight homelab providing:
+
+Media streaming with Jellyfin
+
+A Minecraft multiplayer server
+
+A local AI assistant running entirely offline
+
+All services run inside Docker containers and can be managed from a single compose file.
