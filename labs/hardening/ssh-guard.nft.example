@@ -1,0 +1,8 @@
+# LAB ONLY: replace the interface before use; preserve console access.
+# A narrow reject guard, NOT a complete firewall. Never flush the ruleset.
+table inet classlab_ssh_guard {
+    chain input {
+        type filter hook input priority -10; policy accept;
+        tcp dport 22 iifname != "YOUR_NETBIRD_INTERFACE" counter reject
+    }
+}

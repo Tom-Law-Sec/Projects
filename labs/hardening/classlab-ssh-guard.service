@@ -1,0 +1,13 @@
+[Unit]
+Description=Classroom NetBird-only SSH deny guard
+After=network-pre.target
+Before=ssh.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/nft -f /etc/classlab/ssh-guard.nft
+RemainAfterExit=yes
+# No ExecStop: stopping this unit must not remove the guard.
+
+[Install]
+WantedBy=multi-user.target

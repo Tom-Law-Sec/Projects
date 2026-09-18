@@ -1,0 +1,114 @@
+{
+  "log": {
+    "loglevel": "warning",
+    "access": "none"
+  },
+  "inbounds": [
+    {
+      "tag": "secure-in",
+      "listen": "0.0.0.0",
+      "port": 8443,
+      "protocol": "vless",
+      "settings": {
+        "users": [
+          {
+            "id": "REPLACE_UUID",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "method": "raw",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "target": "127.0.0.1:443",
+          "xver": 0,
+          "serverNames": [
+            "REPLACE_TLS_HOSTNAME"
+          ],
+          "privateKey": "REPLACE_SERVER_PRIVATE_KEY",
+          "shortIds": [
+            "REPLACE_SHORT_ID"
+          ]
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "mullvad",
+      "protocol": "socks",
+      "settings": {
+        "address": "10.64.0.1",
+        "port": 1080
+      }
+    },
+    {
+      "tag": "netbird",
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "tag": "deny",
+      "protocol": "blackhole",
+      "settings": {}
+    }
+  ],
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "network": "udp",
+        "outboundTag": "deny"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "REPLACE_LAB_PEER_IPV4/32"
+        ],
+        "port": "8088",
+        "network": "tcp",
+        "outboundTag": "netbird"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "127.0.0.0/8",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "224.0.0.0/4",
+          "240.0.0.0/4",
+          "::/0"
+        ],
+        "outboundTag": "deny"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "domain:lab.test",
+          "domain:home.arpa",
+          "domain:localhost",
+          "domain:local"
+        ],
+        "outboundTag": "deny"
+      },
+      {
+        "type": "field",
+        "network": "tcp",
+        "outboundTag": "mullvad"
+      }
+    ]
+  }
+}

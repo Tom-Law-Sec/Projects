@@ -1,0 +1,9 @@
+flowchart LR
+    App[Explicit TCP test application] --> Local[127.0.0.1 SOCKS client]
+    Local -->|VLESS / REALITY| Proxy[Separate proxy VPS]
+    Proxy -->|Allowed peer and test port only| NB[Private NetBird path]
+    NB --> Service[Owned lab health endpoint]
+    Proxy -->|Public TCP destinations| WG[WireGuard / provider SOCKS]
+    WG --> Egress[Mullvad internet egress]
+    Proxy -->|Other private IPs / UDP / literal IPv6| Deny[Reject]
+    Controller[Separate NetBird controller] -.-> NB

@@ -1,0 +1,10 @@
+flowchart TB
+    Laptop[Authorised lab laptop] -->|NetBird and SSH key| SSH[Private management]
+    SSH -->|Local forward| Caddy[Loopback HTTPS / Caddy]
+    Caddy --> Vault[Vaultwarden]
+    Caddy --> Cloud[Nextcloud]
+    Caddy --> Kuma[Private Uptime Kuma]
+    Cloud --> DB[PostgreSQL / internal network]
+    Cloud --> Redis[Redis / internal network]
+    Core[Core service data] --> Backup[Encrypted off-source backup]
+    Backup --> Restore[Isolated restore and access tests]

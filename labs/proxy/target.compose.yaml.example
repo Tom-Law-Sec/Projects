@@ -1,0 +1,19 @@
+# Separate proxy VPS only; these deliberately PUBLIC ports are NOT core app ports.
+# Use an owned DNS hostname and record the selected image digest before running.
+name: classlab-proxy-target
+services:
+  tls-target:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Target.Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./target-data:/data
+      - ./target-config:/config
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"

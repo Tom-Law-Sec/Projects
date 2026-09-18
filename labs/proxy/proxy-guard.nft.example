@@ -1,0 +1,9 @@
+# Fill before loading. No flush ruleset; this table only adds narrow rejects.
+# Keep this guard loaded during WireGuard/NetBird interruption tests.
+table inet classlab_proxy_guard {
+    chain output {
+        type filter hook output priority -10; policy accept;
+        ip daddr 10.64.0.1 oifname != "wg-lab" counter reject
+        ip daddr REPLACE_LAB_PEER_IPV4 oifname != "REPLACE_NETBIRD_INTERFACE" counter reject
+    }
+}

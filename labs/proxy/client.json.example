@@ -1,0 +1,42 @@
+{
+  "log": {
+    "loglevel": "warning",
+    "access": "none"
+  },
+  "inbounds": [
+    {
+      "tag": "local-socks",
+      "listen": "127.0.0.1",
+      "port": 10808,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": false
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "proxy",
+      "protocol": "vless",
+      "settings": {
+        "address": "REPLACE_PROXY_PUBLIC_IPV4",
+        "port": 8443,
+        "id": "REPLACE_UUID",
+        "encryption": "none",
+        "flow": "xtls-rprx-vision"
+      },
+      "streamSettings": {
+        "method": "raw",
+        "security": "reality",
+        "realitySettings": {
+          "serverName": "REPLACE_TLS_HOSTNAME",
+          "fingerprint": "chrome",
+          "password": "REPLACE_CLIENT_REALITY_PASSWORD",
+          "shortId": "REPLACE_SHORT_ID",
+          "spiderX": "/"
+        }
+      }
+    }
+  ]
+}

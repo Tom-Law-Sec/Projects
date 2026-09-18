@@ -1,0 +1,11 @@
+# Fill ONLY from your own newly generated Mullvad WireGuard configuration.
+# This is a selective /32 route, NOT a full-system default route.
+[Interface]
+PrivateKey = REPLACE_WIREGUARD_PRIVATE_KEY
+Address = REPLACE_ASSIGNED_WIREGUARD_IPV4_CIDR
+
+[Peer]
+PublicKey = REPLACE_MULLVAD_PEER_PUBLIC_KEY
+AllowedIPs = 10.64.0.1/32
+Endpoint = REPLACE_MULLVAD_ENDPOINT_IPV4:REPLACE_ENDPOINT_PORT
+PersistentKeepalive = 25

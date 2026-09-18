@@ -1,0 +1,10 @@
+{
+    admin off
+    servers {
+        protocols h1 h2
+    }
+}
+
+REPLACE_TLS_HOSTNAME {
+    respond "Classroom TLS endpoint" 200
+}

@@ -1,0 +1,31 @@
+{
+    auto_https disable_redirects
+    admin off
+    servers {
+        protocols h1 h2
+    }
+}
+
+https://vault.lab.test {
+    tls internal
+    reverse_proxy vaultwarden:80
+}
+
+https://cloud.lab.test {
+    tls internal
+    redir /.well-known/carddav https://cloud.lab.test:8443/remote.php/dav/ 301
+    redir /.well-known/caldav https://cloud.lab.test:8443/remote.php/dav/ 301
+    reverse_proxy nextcloud:80
+}
+
+https://status.lab.test {
+    tls internal
+    reverse_proxy uptime-kuma:3001
+}
+
+# Private certificate-verification endpoint, not a public website.
+https://check.lab.test {
+    tls internal
+    respond /healthz "classlab-https-ok" 200
+    respond "Not found" 404
+}

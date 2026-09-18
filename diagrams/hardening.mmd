@@ -1,0 +1,7 @@
+flowchart LR
+    Unknown[Unpermitted source] -->|Deny test| Boundary[Host and mesh policy]
+    Admin[Approved admin peer] -->|Allow TCP 22| Boundary
+    Boundary --> SSH[SSH key authentication]
+    SSH --> Forward[Private HTTPS forward]
+    Forward --> Login[Application authentication / MFA]
+    Login --> Data[Authorised data access]
